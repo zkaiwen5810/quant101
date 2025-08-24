@@ -11,10 +11,18 @@ class EqDailyPx(models.Model):
     open = models.DecimalField(max_digits=10, decimal_places=4, help_text="Opening price")
     high = models.DecimalField(max_digits=10, decimal_places=4, help_text="Highest price during the day")
     low = models.DecimalField(max_digits=10, decimal_places=4, help_text="Lowest price during the day")
-    last = models.DecimalField(max_digits=10, decimal_places=4, help_text="Last (or closing) price")
+    close = models.DecimalField(max_digits=10, decimal_places=4, help_text="Closing price")
     prev_adj_close = models.DecimalField(max_digits=10, decimal_places=4, help_text="Previous adjusted close (for splits/dividends)")
     chg = models.DecimalField(max_digits=10, decimal_places=4, help_text="Change in price")
     pct_chg = models.DecimalField(max_digits=4, decimal_places=4, help_text="Percentage change in price(based on previous day's close)")
-    volume = models.PositiveBigIntegerField(help_text="Trading volume")
-    turnover = models.DecimalField(max_digits=20, decimal_places=4, help_text="Turnover (in thousand RMB)")
+    volume = models.PositiveBigIntegerField(help_text="Trading volume(in board lots)")
+    turnover = models.DecimalField(max_digits=20, decimal_places=4, help_text="Turnover(in thousand RMB)")
+    created_at = models.DateTimeField(auto_now_add=True, help_text="Date and time of creation")
+    updated_at = models.DateTimeField(auto_now=True, help_text="Date and time of last update")
+
+    class Meta:
+        db_table = "eq_daily_px"
+        verbose_name = "Equity Daily Price"
+        verbose_name_plural = "Equity Daily Prices"
+        unique_together = ("ticker", "trade_date")
 
