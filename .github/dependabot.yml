@@ -6,7 +6,11 @@
 
 version: 2
 updates:
- - package-ecosystem: "devcontainers"
-   directory: "/"
-   schedule:
-     interval: weekly
+  # This section defines a set of dependencies to check.
+  - package-ecosystem: "pip"     # The package manager to use (e.g., "npm", "gomod", "maven").
+    directory: "/"               # Location of package manifests (e.g., requirements.txt).
+    schedule:
+      interval: "daily"          # How often to check for updates ("weekly", "monthly").
+    open-pull-requests-limit: 10 # A limit on how many PRs Dependabot can have open at once.
+    reviewers:
+      - "zkaiwen5810"
