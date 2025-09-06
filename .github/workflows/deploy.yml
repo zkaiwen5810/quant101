@@ -1,0 +1,50 @@
+# .github/workflows/deploy.yml
+
+# 1. Workflow Name
+name: Deploy to DigitalOcean
+
+# 2. Event (Trigger)
+# This workflow runs on any push to the 'main' branch
+on:
+  push:
+    branches:
+      - main
+
+# 3. Jobs
+jobs:
+  deploy:
+    # 4. Runner
+    # This job runs on our self-hosted runner located on the droplet
+    runs-on: self-hosted
+
+    # 5. Steps
+    # A sequence of tasks to be executed
+    steps:
+      - name: Checkout repository code
+        uses: actions/checkout@v4
+        # This action checks out your code onto the runner.
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.13.3' 
+        # Installs a specific Python version.
+
+      - name: Create .env file
+        run: |
+          echo "TUSHARE_TOKEN=${{ secrets.TUSHARE_TOKEN }}" >> .env
+          echo "DIGITALOCEAN_DB_PASSWORD=${{ secrets.DIGITALOCEAN_DB_PASSWORD }}" >> .env
+        # This command takes each secret and writes it to a .env file on the runner.
+
+      - name: Install dependencies
+        run: |
+          python -m venv venv
+          source venv/bin/activate
+          pip install -r requirements.txt
+        # Installs project dependencies inside a virtual environment.
+
+      - name: Run database migrations
+        run: |
+          source venv/bin/activate
+          python manage.py migrate
+        # Applies database migrations.
