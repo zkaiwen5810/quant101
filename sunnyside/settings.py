@@ -86,7 +86,7 @@ DATABASES = {
     },
     "digitalocean": {
         "ENGINE": "django.db.backends.mysql",
-        "NAME": "sunnyside ",
+        "NAME": "sunnyside",
         "HOST": "localhost",
         "PORT": 3306,
         "USER": "sunnyside",
