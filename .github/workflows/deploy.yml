@@ -46,5 +46,5 @@ jobs:
       - name: Run database migrations
         run: |
           source venv/bin/activate
-          python manage.py migrate
+          python manage.py migrate --database digitalocean
         # Applies database migrations.
