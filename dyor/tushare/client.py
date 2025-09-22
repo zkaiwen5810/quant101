@@ -1,4 +1,5 @@
-from typing import Dict, Optional, Union
+from functools import partial
+from typing import Dict, List, Optional, Union
 from dyor.http.request import HttpClient
 
 class TushareClient(HttpClient):
@@ -7,20 +8,24 @@ class TushareClient(HttpClient):
         super().__init__(base_url, headers)
         self._token = token
     
-    def _post(self, path: str, data: Optional[Dict] = None):
-        d = {"token": self._token}
-        if data:
-            d.update(data)
-        return self.post(path=path, data=d)
-    
-    def daily(self, params: Dict) -> Dict:
-        data = {
-            "api_name": "daily",
-            "params": params,
-        }
-        response = self._post("", data=data)
+    def _post(self, path: str, api_name: str, fields: List[str] = None, params: Optional[Dict] = None):
+        """
+        returns:
+            fields: List[str]
+            items: List[Dict]
+        """
+        d = {"api_name": api_name, "token": self._token, "params": params or {}}
+        if fields:
+            d["fields"] = ",".join(fields)
+        response = self.post(path=path, data=d)
         response.raise_for_status()
-        return response.json()
+        result = response.json()
+        if result["code"] != 0:
+            raise Exception(result["msg"])
+        return result["data"]
+    
+    def __getattr__(self, name: str):
+        return partial(self._post, "", name)
 
 if __name__ == '__main__':
     import os
@@ -37,3 +42,20 @@ if __name__ == '__main__':
         "trade_date": "20241219"
     }
     print(client.daily(params=params))
+
+    # params = {
+    #     "ts_code": "600519.SH",
+    # }
+    # fields=[
+    #     "ts_code",
+    #     "symbol",
+    #     "name",
+    #     "area",
+    #     "industry",
+    #     "cnspell",
+    #     "market",
+    #     "list_date",
+    #     "act_name",
+    #     "act_ent_type",
+    # ]
+    # print(client.stock_basic(params=params, fields=fields))
