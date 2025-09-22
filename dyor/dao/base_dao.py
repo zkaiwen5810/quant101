@@ -7,6 +7,7 @@ separating business logic from data access concerns.
 
 from typing import List, Optional, Dict, Any, Type, TypeVar, Generic
 from django.db import models, transaction
+from django.db import IntegrityError
 from django.db.models import QuerySet, Q
 from django.core.exceptions import ObjectDoesNotExist, ValidationError
 import logging
@@ -63,13 +64,17 @@ class BaseDAO(Generic[T]):
         """
         try:
             instance = self.model_class(**kwargs)
-            instance.full_clean()
+            # Run field/clean validations only; let the database enforce uniqueness
+            instance.full_clean(validate_unique=False)
             instance.save(using=using)
             logger.info(f"Created {self.model_class.__name__} with id: {instance.pk}")
             return instance
         except ValidationError as e:
             logger.error(f"Validation error creating {self.model_class.__name__}: {e}")
             raise
+        except IntegrityError as e:
+            logger.error(f"Integrity error creating {self.model_class.__name__}: {e}")
+            raise ValidationError(str(e))
         except Exception as e:
             logger.error(f"Error creating {self.model_class.__name__}: {e}")
             raise
@@ -184,13 +189,17 @@ class BaseDAO(Generic[T]):
         try:
             for field, value in kwargs.items():
                 setattr(instance, field, value)
-            instance.full_clean()
+            # Run field/clean validations only; let the database enforce uniqueness
+            instance.full_clean(validate_unique=False)
             instance.save(using=using)
             logger.info(f"Updated {self.model_class.__name__} with id: {instance.pk}")
             return instance
         except ValidationError as e:
             logger.error(f"Validation error updating {self.model_class.__name__}: {e}")
             raise
+        except IntegrityError as e:
+            logger.error(f"Integrity error updating {self.model_class.__name__}: {e}")
+            raise ValidationError(str(e))
         except Exception as e:
             logger.error(f"Error updating {self.model_class.__name__}: {e}")
             raise
