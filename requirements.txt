@@ -7,7 +7,7 @@ dotenv==0.9.9
 gitdb==4.0.12
 GitPython==3.1.41
 idna==3.10
-mssql-django==1.5
+mssql-django==1.6
 mysqlclient==2.2.7
 numpy==2.2.5
 psycopg2==2.9.10
