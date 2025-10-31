@@ -14,7 +14,7 @@ psycopg2==2.9.10
 pyodbc==5.2.0
 python-dotenv==1.1.0
 pytz==2025.2
-requests==2.32.3
+requests==2.32.5
 setuptools==75.6.0
 smmap==5.0.2
 sqlparse==0.5.3
